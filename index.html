@@ -1,320 +1,623 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>MiauAPI - Menu Framework</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Inter,sans-serif}
-body{background:transparent}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-thumb{background:rgba(139,92,246,.4);border-radius:2px}
-::-webkit-scrollbar-track{background:transparent}
-
-.menu-root{position:absolute;left:2vh;top:2vh;width:36vh;max-height:42vh;display:flex;flex-direction:column;background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0f0f0f 100%);border-radius:1.2vh;border:1px solid rgba(139,92,246,.15);overflow:hidden;box-shadow:0 0 3vh rgba(139,92,246,.15)}
-.menu-header{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(168,85,247,.08));padding:1.2vh 1.6vh;text-align:center;border-bottom:1px solid rgba(139,92,246,.12);cursor:move;user-select:none}
-.menu-header h1{color:#8b5cf6;font-size:1.6vh;font-weight:600;letter-spacing:.5px;text-shadow:0 0 1vh rgba(139,92,246,.2)}
-.menu-body{display:flex;flex:1;min-height:0}
-.menu-tabs{width:9vh;flex-shrink:0;background:rgba(0,0,0,.3);padding:.6vh 0;border-right:1px solid rgba(139,92,246,.1)}
-.tab-btn{display:block;width:100%;padding:.7vh .6vh;background:transparent;border:none;color:rgba(255,255,255,.5);font-size:1.1vh;text-align:center;cursor:pointer;transition:all .2s;position:relative;font-family:inherit}
-.tab-btn:hover{color:#fff;background:rgba(139,92,246,.1)}
-.tab-btn.active{color:#8b5cf6;background:rgba(139,92,246,.12)}
-.tab-btn.active::before{content:'';position:absolute;left:0;top:15%;height:70%;width:2px;background:#8b5cf6;border-radius:0 2px 2px 0}
-.menu-content{flex:1;overflow-y:auto;padding:.6vh .8vh;min-height:20vh;max-height:38vh}
-.menu-item{display:flex;align-items:center;justify-content:space-between;padding:.55vh .6vh;margin:.15vh 0;border-radius:.4vh;cursor:pointer;transition:all .15s;min-height:2.6vh}
-.menu-item:hover{background:rgba(139,92,246,.08)}
-.menu-item .label{color:#fff;font-size:1.2vh;font-weight:400;flex:1}
-.btn-item{justify-content:center}
-.btn-item .label{text-align:center;color:#c084fc;font-weight:500;font-size:1.2vh}
-.btn-item:hover{background:rgba(139,92,246,.15)}
-.btn-item:hover .label{color:#8b5cf6}
-.toggle-track{width:2.8vh;height:1.4vh;background:rgba(255,255,255,.15);border-radius:.7vh;position:relative;transition:all .25s;flex-shrink:0}
-.toggle-track.on{background:rgba(139,92,246,.5)}
-.toggle-knob{position:absolute;top:.15vh;left:.15vh;width:1.1vh;height:1.1vh;background:#fff;border-radius:50%;transition:all .25s;box-shadow:0 .1vh .2vh rgba(0,0,0,.3)}
-.toggle-track.on .toggle-knob{left:calc(100% - 1.25vh);background:#8b5cf6}
-.slider-container{padding:.4vh 0;flex-direction:column;align-items:stretch!important}
-.slider-container .label{margin-bottom:.25vh}
-.slider-row{display:flex;align-items:center;gap:.6vh}
-.slider-row input[type=range]{flex:1;-webkit-appearance:none;height:.3vh;border-radius:.15vh;background:rgba(139,92,246,.3);outline:none}
-.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:1.2vh;height:1.2vh;border-radius:50%;background:#8b5cf6;cursor:pointer;box-shadow:0 0 .4vh rgba(139,92,246,.4)}
-.slider-value{color:#c084fc;font-size:1.1vh;min-width:2.5vh;text-align:right;font-weight:500}
-.notification-container{position:fixed;bottom:2vh;right:2vh;z-index:9999;display:flex;flex-direction:column-reverse;gap:.5vh}
-.notif{background:rgba(15,15,15,.92);border-left:3px solid #8b5cf6;padding:.8vh 1.2vh;border-radius:.4vh;color:#fff;font-size:1.2vh;max-width:30vh;animation:notifIn .3s ease,notifOut .3s ease 4.7s forwards;box-shadow:0 .2vh 1vh rgba(0,0,0,.4)}
-.notif.error{border-left-color:#ef4444}
-.notif.success{border-left-color:#10b981}
-.notif.warning{border-left-color:#f59e0b}
-@keyframes notifIn{from{opacity:0;transform:translateX(3vh)}to{opacity:1;transform:translateX(0)}}
-@keyframes notifOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(3vh)}}
-.player-list{position:fixed;right:2vh;top:50%;transform:translateY(-50%);width:18vh;max-height:40vh;background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0f0f0f 100%);border-radius:1vh;border:1px solid rgba(139,92,246,.12);overflow-y:auto;padding:.4vh 0}
-.player-item{display:flex;align-items:center;padding:.5vh .8vh;color:rgba(255,255,255,.7);font-size:1vh;cursor:pointer;transition:all .1s;justify-content:space-between}
-.player-item:hover{background:rgba(139,92,246,.1);color:#fff}
-.player-item.selected{background:rgba(139,92,246,.15);color:#8b5cf6}
-.player-item .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.player-item .dist{color:rgba(255,255,255,.35);font-size:.9vh;margin-left:.4vh}
-.player-item .status{font-size:.9vh;margin-left:.4vh}
-.player-item .status.dead{color:#ef4444}
-.player-item .status.alive{color:#10b981}
-</style>
+  <meta charset="UTF-8" />
+  <title>MiauScript</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    body::-webkit-scrollbar,.content::-webkit-scrollbar{display:none}
+    body{-ms-overflow-style:none;scrollbar-width:none;background:transparent;overflow:hidden;height:100vh;width:100vw}
+    #appWrap{position:absolute;left:20px;top:20px;width:900px;height:680px}
+    #dragBar{width:100%;height:10px;cursor:move;background:transparent;position:absolute;top:-10px;left:0;z-index:10}
+    #app{width:100%;height:100%;border:1px solid #444;display:flex;overflow:hidden;background:rgba(25,25,35,0.95);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);position:relative}
+    .sidebar{width:200px;background:rgb(0 0 0 / 95%);display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:15px 0;border-right:1px solid #333}
+    .logo{width:180px;height:90px;display:flex;justify-content:center;align-items:center;border-radius:10px;margin-bottom:20px;box-shadow:0 4px 10px rgba(0,0,0,0.3);overflow:hidden;background:#000}
+    .logo img{width:50%;height:100%}
+    .menu-buttons{display:flex;flex-direction:column;align-items:center;width:100%}
+    .sidebar button{width:90%;padding:10px 10px;margin:10px 0;background:rgba(40,40,55,0.8);color:#ff0000;border:none;outline:none;cursor:pointer;border-radius:8px;transition:all 0.3s ease;font-size:14px;display:flex;align-items:center;justify-content:flex-start;gap:12px;box-shadow:0 3px 6px rgba(0,0,0,0.2)}
+    .sidebar button i{margin-left:10px;width:20px;text-align:center;color:#fff}
+    .sidebar button:hover{background:rgba(60,60,80,0.9);transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.3)}
+    .sidebar button.active{background:linear-gradient(45deg,#600f0f,#000);color:#fff;transform:scale(1.02);box-shadow:0 0 15px rgb(255 255 255 / 40%);border-left:4px solid #d90000}
+    .sidebar button.active i{color:#ff0000}
+    .footer-info{width:90%;padding:8px;text-align:left;color:#ddd;font-size:12px;border-top:1px solid #333;margin-top:auto;background:rgba(20,20,30,0.7);border-radius:6px;display:flex;align-items:center;gap:8px}
+    .user-profile-footer{display:flex;align-items:center;gap:8px;width:100%}
+    .user-avatar-footer{width:32px;height:32px;border-radius:50%;border:1px solid #ff4a4a;object-fit:cover}
+    .user-details-footer{display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0}
+    .user-name-footer{font-weight:bold;color:#ff4a4a;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .user-role-footer{color:#aaa;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .loading-placeholder{color:#777;font-style:italic;width:100%;text-align:center;padding:5px 0}
+    .content{flex:1;padding:20px;color:#fff;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;overflow:hidden;opacity:0.85}
+    .content-header{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:10px;padding:8px 0;border-bottom:1px solid #444;position:relative}
+    .content-header h2{font-size:24px;color:#ff4a4a;margin:0}
+    .sub-menu-tabs{display:flex;gap:15px;border-bottom:1px solid #444;padding-bottom:6px;margin-bottom:10px;width:100%}
+    .sub-menu-tab{padding:6px 12px;background:transparent;border:none;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.3s ease;font-weight:bold;font-size:13px}
+    .sub-menu-tab:hover{color:#ff0000}
+    .sub-menu-tab.active{color:#fff;border-bottom:2px solid #ff0000}
+    .content-section{width:100%;background:transparent;border:none;box-shadow:none;padding:0;margin:0;flex:1;overflow:hidden;display:flex;flex-direction:column}
+    .category-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;height:100%;overflow:hidden}
+    .category-card{background:rgb(0 0 0 / 60%);border-radius:8px;padding:8px;border:1px solid #444;display:flex;flex-direction:column;overflow:hidden}
+    .category-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #444;color:#ff0000;font-size:13px}
+    .category-header i{font-size:14px;margin-right:5px}
+    .feature-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #333;margin-bottom:5px}
+    .feature-name{flex:1;display:flex;flex-direction:column;cursor:pointer}
+    .feature-name h4{color:#ddd;margin-bottom:1px;font-size:12px}
+    .feature-name h4:hover{color:#ff0000}
+    .feature-name p{color:#aaa;font-size:10px}
+    .feature-status{display:flex;align-items:center;gap:5px;font-size:10px;color:#ff0000}
+    .feature-status .status-indicator{width:6px;height:6px;border-radius:50%;background:#ff4a4a}
+    .feature-status.safe .status-indicator{background:#00ff00}
+    .feature-status.risk .status-indicator{background:#ff0000}
+    .feature-actions{display:flex;align-items:center;gap:6px}
+    .config-icon{color:#aaa;cursor:pointer;font-size:12px}
+    .config-icon:hover{color:#ff4a4a}
+    .toggle-switch{position:relative;display:inline-block;width:40px;height:20px}
+    .toggle-switch input{opacity:0;width:0;height:0}
+    .slider-toggle{position:absolute;cursor:default;top:0;left:0;right:0;bottom:0;background-color:#444;transition:.4s;border-radius:22px}
+    .slider-toggle:before{position:absolute;content:"";height:14px;width:14px;left:3px;bottom:3px;background-color:white;transition:.4s;border-radius:50%}
+    input:checked + .slider-toggle{background:linear-gradient(45deg,#600f0f,#ff0000)}
+    input:checked + .slider-toggle:before{transform:translateX(20px)}
+    .fov-slider-container{display:flex;align-items:center;gap:8px;margin-left:10px}
+    .fov-slider{width:100px;height:4px;background:#444;border-radius:2px;outline:none;-webkit-appearance:none}
+    .fov-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:12px;height:12px;border-radius:50%;background:#ff0000;cursor:pointer;border:2px solid #fff}
+    .fov-slider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#ff0000;cursor:pointer;border:2px solid #fff}
+    .fov-value{color:#ff0000;font-size:10px;font-weight:bold;min-width:30px;text-align:center}
+    .configuracoes-container{display:flex;justify-content:center;align-items:flex-start;width:100%;height:100%;padding:10px;box-sizing:border-box}
+    .configuracoes-card{width:100%;max-width:800px;background:rgb(0 0 0 / 60%);border-radius:8px;padding:12px;border:1px solid #444;display:flex;flex-direction:column;overflow:hidden}
+    .configuracoes-card .category-header{justify-content:center;text-align:center}
+    .configuracoes-card .feature-row{justify-content:space-between;align-items:center}
+    .configuracoes-card .feature-name{flex-grow:1}
+    .configuracoes-card .feature-actions{margin-left:10px}
+  </style>
 </head>
 <body>
-
-<div class="notification-container" id="notifContainer"></div>
-<div class="menu-root" id="menuRoot">
-  <div class="menu-header"><h1>MIAU MENU</h1></div>
-  <div class="menu-body">
-    <div class="menu-tabs" id="tabContainer"></div>
-    <div class="menu-content" id="contentContainer"></div>
+<div id="appWrap">
+  <div id="dragBar"></div>
+  <div id="app">
+    <div class="sidebar">
+      <div class="logo">
+        <img src="https://jonquishot.github.io/Background/logo.png" alt="MiauScript Logo">
+      </div>
+      <div class="menu-buttons">
+        <button v-for="btn in buttons" :key="btn.name"
+                @click="selectButton(btn.name)"
+                :class="{ active: activeButton === btn.name }">
+          <i :class="btn.icon"></i>
+          {{ btn.label }}
+        </button>
+      </div>
+      <div class="footer-info">
+        <div v-if="userProfile.name" class="user-profile-footer">
+          <img :src="userProfile.avatar" alt="Avatar" class="user-avatar-footer">
+          <div class="user-details-footer">
+            <span class="user-name-footer">{{ userProfile.name }}</span>
+            <span class="user-role-footer">{{ userProfile.role }}</span>
+          </div>
+        </div>
+        <div v-else class="loading-placeholder">Carregando perfil...</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="content-header" style="display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:nowrap">
+      <div class="sub-menu-tabs" style="display:flex;gap:20px;align-items:center;border:none;padding:0;margin:0;flex:1;align-self:stretch">
+        <template v-if="activeButton === 'Jogador'">
+          <button v-for="tab in jogadorTabs" :key="tab.name" @click="selectSubTab(tab.name)" :class="{ active: activeSubTab === tab.name }" class="sub-menu-tab">{{ tab.label }}</button>
+        </template>
+        <template v-if="activeButton === 'Veiculos'">
+          <button v-for="tab in veiculosTabs" :key="tab.name" @click="selectSubTab(tab.name)" :class="{ active: activeSubTab === tab.name }" class="sub-menu-tab">{{ tab.label }}</button>
+        </template>
+        <template v-if="activeButton === 'Armas'">
+          <button v-for="tab in armasTabs" :key="tab.name" @click="selectSubTab(tab.name)" :class="{ active: activeSubTab === tab.name }" class="sub-menu-tab">{{ tab.label }}</button>
+        </template>
+        <template v-if="activeButton === 'Aimbot'">
+          <button v-for="tab in aimbotTabs" :key="tab.name" @click="selectSubTab(tab.name)" :class="{ active: activeSubTab === tab.name }" class="sub-menu-tab">{{ tab.label }}</button>
+        </template>
+        <template v-if="activeButton === 'Online'">
+          <button v-for="tab in onlineTabs" :key="tab.name" @click="selectSubTab(tab.name)" :class="{ active: activeSubTab === tab.name }" class="sub-menu-tab">{{ tab.label }}</button>
+        </template>
+        <template v-if="activeButton === 'Exploits'">
+          <button v-for="tab in exploitsTabs" :key="tab.name" @click="selectSubTab(tab.name)" :class="{ active: activeSubTab === tab.name }" class="sub-menu-tab">{{ tab.label }}</button>
+        </template>
+        <template v-if="activeButton === 'Visual'">
+          <button v-for="tab in visualTabs" :key="tab.name" @click="selectSubTab(tab.name)" :class="{ active: activeSubTab === tab.name }" class="sub-menu-tab">{{ tab.label }}</button>
+        </template>
+        <template v-if="activeButton === 'Configuracoes'">
+          <button v-for="tab in configuracoesTabs" :key="tab.name" @click="selectSubTab(tab.name)" :class="{ active: activeSubTab === tab.name }" class="sub-menu-tab">{{ tab.label }}</button>
+        </template>
+      </div>
+        <div class="search-bar" style="margin-left:20px"></div>
+      </div>
+      <div class="content-section">
+        <!-- Jogador / Geral -->
+        <div v-if="activeButton === 'Jogador' && activeSubTab === 'Geral'" style="height:100%;overflow:hidden">
+          <div class="category-grid">
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-user"></i> Geral</div></div>
+              <div class="feature-row" v-for="(f, i) in jogadorGeralFeatures" :key="'jg-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('jogadorGeral',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-walking"></i> Movimentação</div></div>
+              <div class="feature-row" v-for="(f, i) in jogadorMovimentacaoFeatures" :key="'jm-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('jogadorMov',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-bolt"></i> Poderes</div></div>
+              <div class="feature-row" v-for="(f, i) in jogadorPoderesFeatures" :key="'jp-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('jogadorPod',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-shield-alt"></i> Outros</div></div>
+              <div class="feature-row" v-for="(f, i) in jogadorOutrosFeatures" :key="'jo-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('jogadorOut',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Jogador / Roupa -->
+        <div v-if="activeButton === 'Jogador' && activeSubTab === 'Roupa'" style="height:100%;overflow:hidden;display:flex;flex-direction:column">
+          <div class="category-grid" style="flex:1">
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-tshirt"></i> Roupas customizadas</div></div>
+              <div class="feature-row" v-for="(f, i) in jogadorRoupaFeatures" :key="'jr-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('jogadorRoupa',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-tshirt"></i> Roupas customizadas</div></div>
+              <div class="feature-row" v-for="(f, i) in jogadorRoupaPresets" :key="'jrp-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-eye config-icon"></i>
+                  <i class="fas fa-edit config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('jogadorRoupaPreset',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px">
+            <button class="btn btn-secondary" style="padding:6px 12px;background:#aa2222;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px">Remover</button>
+            <button class="btn btn-primary" style="padding:6px 12px;background:#22aa22;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px">Adicionar</button>
+          </div>
+        </div>
+        <!-- Veiculos / Todos -->
+        <div v-if="activeButton === 'Veiculos' && activeSubTab === 'Todos'" style="height:100%;overflow:hidden">
+          <div class="category-grid">
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-car"></i> Todos os Veículos</div></div>
+              <div class="feature-row" v-for="(f, i) in veiculosFeatures" :key="'v-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('veiculos',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Armas / Todas -->
+        <div v-if="activeButton === 'Armas' && activeSubTab === 'Todas'" style="height:100%;overflow:hidden">
+          <div class="category-grid">
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-gun"></i> Todas as Armas</div></div>
+              <div class="feature-row" v-for="(f, i) in armasFeatures" :key="'a-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('armas',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Aimbot / Geral -->
+        <div v-if="activeButton === 'Aimbot' && activeSubTab === 'Geral'" style="height:100%;overflow:hidden">
+          <div class="category-grid">
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-crosshairs"></i> Geral do Aimbot</div></div>
+              <div class="feature-row" v-for="(f, i) in aimbotFeatures" :key="'ab-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('aimbot',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+              <div class="feature-row" style="border:none;padding:6px 0 0 0;margin-bottom:0">
+                <div class="feature-name" style="cursor:default"><h4>FOV Aimlock</h4><p>Valor atual do campo de visão do Aimlock</p></div>
+                <div class="feature-status" style="visibility:hidden"></div>
+                <div class="feature-actions" style="align-items:center">
+                  <div class="fov-slider-container">
+                    <input type="range" min="1" max="100" step="0.1" v-model.number="fovAimlockValue" @input="sendSlider('FovAimlock',fovAimlockValue)" class="fov-slider">
+                    <span class="fov-value">{{ Number(fovAimlockValue).toFixed(1) }}/100.0</span>
+                  </div>
+                </div>
+              </div>
+              <div class="feature-row" style="border:none;padding:6px 0 0 0;margin-bottom:0">
+                <div class="feature-name" style="cursor:default"><h4>FOV Silent</h4><p>Valor atual do campo de visão do Silent Aim</p></div>
+                <div class="feature-status" style="visibility:hidden"></div>
+                <div class="feature-actions" style="align-items:center">
+                  <div class="fov-slider-container">
+                    <input type="range" min="1" max="100" step="0.1" v-model.number="fovSilentValue" @input="sendSlider('FovSilent',fovSilentValue)" class="fov-slider">
+                    <span class="fov-value">{{ Number(fovSilentValue).toFixed(1) }}/100.0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Online / Todos -->
+        <div v-if="activeButton === 'Online' && activeSubTab === 'Todos'" style="height:100%;overflow:hidden">
+          <div class="category-grid">
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-users"></i> Jogadores Online</div></div>
+              <div class="feature-row" v-for="(f, i) in onlinePlayers" :key="'ol-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <button class="btn btn-secondary" style="padding:3px 6px;font-size:10px;background:rgba(60,60,80,0.8);border:none;color:#ddd;border-radius:4px;cursor:pointer"><i class="fas fa-user-plus"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Exploits / Trolls -->
+        <div v-if="activeButton === 'Exploits' && activeSubTab === 'Trolls'" style="height:100%;overflow:hidden">
+          <div class="category-grid">
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-shield-alt"></i> Sistema Trolls</div></div>
+              <div class="feature-row" v-for="(f, i) in exploitsFeatures" :key="'ex-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('exploits',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Visual / ESP -->
+        <div v-if="activeButton === 'Visual' && activeSubTab === 'ESP'" style="height:100%;overflow:hidden">
+          <div class="category-grid">
+            <div class="category-card">
+              <div class="category-header"><div><i class="fas fa-eye"></i> Configurações Visuais</div></div>
+              <div class="feature-row" v-for="(f, i) in visualFeatures" :key="'vis-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('visual',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Configuracoes / Geral -->
+        <div v-if="activeButton === 'Configuracoes' && activeSubTab === 'Geral'" style="height:100%;overflow:hidden;display:flex;flex-direction:column">
+          <div class="configuracoes-container">
+            <div class="configuracoes-card">
+              <div class="category-header"><div><i class="fas fa-cog"></i> Configurações Gerais</div></div>
+              <div class="feature-row" v-for="(f, i) in configuracoesFeatures" :key="'cfg-'+i">
+                <div class="feature-name" @click="toggleFeature(f)"><h4>{{ f.name }}</h4><p>{{ f.desc }}</p></div>
+                <div class="feature-status" :class="f.statusClass"><span class="status-indicator"></span></div>
+                <div class="feature-actions">
+                  <i class="fas fa-cog config-icon"></i>
+                  <label class="toggle-switch"><input type="checkbox" :checked="f.enabled" @change="onToggle('config',i,$event)"><span class="slider-toggle"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<div class="player-list" id="playerList" style="display:none"></div>
-
 <script>
-var menuRoot = document.getElementById('menuRoot');
-var tabContainer = document.getElementById('tabContainer');
-var contentContainer = document.getElementById('contentContainer');
-var notifContainer = document.getElementById('notifContainer');
-var playerListEl = document.getElementById('playerList');
-
-var menuData = null;
-var activeTab = null;
 var isInGame = false;
+var isVisible = true;
 
-var dragTarget = null, dragOffX = 0, dragOffY = 0;
-var header = menuRoot.querySelector('.menu-header');
-header.addEventListener('mousedown', function(e) {
-  dragTarget = menuRoot;
-  dragOffX = e.clientX - menuRoot.offsetLeft;
-  dragOffY = e.clientY - menuRoot.offsetTop;
-});
-document.addEventListener('mousemove', function(e) {
-  if (!dragTarget) return;
-  dragTarget.style.left = (e.clientX - dragOffX) + 'px';
-  dragTarget.style.top = (e.clientY - dragOffY) + 'px';
-});
-document.addEventListener('mouseup', function() { dragTarget = null; });
+// Drag
+(function(){
+  var wrap = document.getElementById('appWrap');
+  var bar = document.getElementById('dragBar');
+  var offX, offY, dragging = false;
+  bar.addEventListener('mousedown', function(e){
+    dragging = true;
+    offX = e.clientX - wrap.offsetLeft;
+    offY = e.clientY - wrap.offsetTop;
+  });
+  document.addEventListener('mousemove', function(e){
+    if (!dragging) return;
+    wrap.style.left = (e.clientX - offX) + 'px';
+    wrap.style.top = (e.clientY - offY) + 'px';
+  });
+  document.addEventListener('mouseup', function(){ dragging = false; });
+})();
 
-function notify(msg, type) {
-  var el = document.createElement('div');
-  el.className = 'notif' + (type ? ' ' + type : '');
-  el.textContent = msg;
-  notifContainer.appendChild(el);
-  setTimeout(function() { el.remove(); }, 5000);
-}
-
-function sendAction(action, data) {
+function sendAction(action, payload) {
   if (!isInGame) return;
-  var body = JSON.stringify(Object.assign({ action: action }, data));
   fetch('http://localhost/menuClick', {
     method: 'POST',
-    body: body,
+    body: JSON.stringify(Object.assign({ action: action }, payload || {})),
     headers: { 'Content-Type': 'application/json' }
   }).catch(function(){});
 }
 
-function renderTabs() {
-  if (!menuData || !menuData.tabs) return;
-  tabContainer.innerHTML = '';
-  menuData.tabs.forEach(function(t) {
-    var btn = document.createElement('button');
-    btn.className = 'tab-btn' + (t.id === activeTab ? ' active' : '');
-    btn.textContent = t.text || t.id;
-    btn.dataset.id = t.id;
-    btn.onclick = function() {
-      activeTab = t.id;
-      renderTabs();
-      renderContent();
-    };
-    tabContainer.appendChild(btn);
-  });
-}
-
-function renderContent() {
-  contentContainer.innerHTML = '';
-  if (!menuData || !menuData.tabs) return;
-  var tab = null;
-  for (var i = 0; i < menuData.tabs.length; i++) {
-    if (menuData.tabs[i].id === activeTab) { tab = menuData.tabs[i]; break; }
+var app = new Vue({
+  el: '#app',
+  data: {
+    activeButton: 'Jogador',
+    activeSubTab: 'Geral',
+    buttons: [
+      { name: 'Jogador', label: 'Jogador', icon: 'fas fa-user' },
+      { name: 'Veiculos', label: 'Veículos', icon: 'fas fa-car' },
+      { name: 'Armas', label: 'Armas', icon: 'fas fa-gun' },
+      { name: 'Aimbot', label: 'Aimbot', icon: 'fas fa-crosshairs' },
+      { name: 'Online', label: 'Online', icon: 'fas fa-users' },
+      { name: 'Exploits', label: 'Exploits', icon: 'fas fa-shield-alt' },
+      { name: 'Visual', label: 'Visual', icon: 'fas fa-eye' },
+      { name: 'Configuracoes', label: 'Configurações', icon: 'fas fa-cog' }
+    ],
+    jogadorTabs: [{ name: 'Geral', label: 'Geral' }, { name: 'Roupa', label: 'Roupa' }],
+    veiculosTabs: [{ name: 'Todos', label: 'Todos' }],
+    armasTabs: [{ name: 'Todas', label: 'Todas' }],
+    aimbotTabs: [{ name: 'Geral', label: 'Geral' }],
+    onlineTabs: [{ name: 'Todos', label: 'Todos' }],
+    exploitsTabs: [{ name: 'Trolls', label: 'Trolls' }],
+    visualTabs: [{ name: 'ESP', label: 'ESP' }],
+    configuracoesTabs: [{ name: 'Geral', label: 'Geral' }],
+    userProfile: { name: 'Usuário Anônimo', role: 'Visitante', avatar: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' },
+    jogadorGeralFeatures: [
+      { name: 'God Mod', id:'Godmod', desc: 'Invencibilidade total', statusClass: 'safe', enabled: false },
+      { name: 'Reviver', id:'Reviver', desc: 'Revive ou Curar-se', statusClass: 'safe', enabled: false },
+      { name: 'Suicidar', id:'Suicidio', desc: 'Retira sua vida', statusClass: 'safe', enabled: false },
+      { name: 'No Clip', id:'Noclip', desc: 'Voa e atravessa elementos', statusClass: 'safe', enabled: false },
+      { name: 'Invisivel', id:'Invisivel', desc: 'Só ADM consegue te ver', statusClass: 'safe', enabled: false }
+    ],
+    jogadorMovimentacaoFeatures: [
+      { name: 'Salvar TPMorto', id:'SalvarTPMorto', desc: 'Usar antes do TPWay Morto', statusClass: 'safe', enabled: false },
+      { name: 'TPway Morto', id:'TPMorto', desc: 'Teleporta ao morrer', statusClass: 'safe', enabled: false },
+      { name: 'Teleporte Waypoint', id:'TPWaypoint', desc: 'Teleporta para o local marcado', statusClass: 'safe', enabled: false },
+      { name: 'Correr Rapido', id:'SuperPulo', desc: 'Boost aceitavel', statusClass: 'safe', enabled: false },
+      { name: '[F] Rápido', id:'EntradaRapida', desc: 'Entra/sai rapido do veículo', statusClass: 'safe', enabled: false }
+    ],
+    jogadorPoderesFeatures: [
+      { name: 'Hulk', id:'Hulk', desc: 'Arremessa veículos no Y', statusClass: 'safe', enabled: false },
+      { name: 'Magneto', id:'Magneto', desc: 'Atrair e repelir veículos', statusClass: 'safe', enabled: false },
+      { name: 'Flash', id:'Modo Flash', desc: 'Homem mais rapido do mundo', statusClass: 'safe', enabled: false },
+      { name: 'Andar sobre a água', id:'AndarAgua', desc: 'Igual Jesus', statusClass: 'risk', enabled: false },
+      { name: 'Lince Negra', id:'WallGhost', desc: 'Atravessar parede', statusClass: 'risk', enabled: false }
+    ],
+    jogadorOutrosFeatures: [
+      { name: 'Reset PED', id:'ResetPed', desc: 'Reseta o seu personagem', statusClass: 'safe', enabled: false },
+      { name: 'Sessão Solo', id:'SessaoSolo', desc: 'Outra dimensão', statusClass: 'safe', enabled: false },
+      { name: 'Anti-ADM', id:'AntiADM', desc: 'Se esconde distande de todos', statusClass: 'safe', enabled: false },
+      { name: 'No Ragdoll', id:'NoRagdoll', desc: 'Não cai da moto', statusClass: 'safe', enabled: false },
+      { name: 'FreeCam', id:'CameraLivre', desc: 'Não cai da moto', statusClass: 'safe', enabled: false }
+    ],
+    jogadorRoupaFeatures: [
+      { name: 'Mão', id:'Mao', desc: 'Personalizar mãos', statusClass: 'safe', enabled: false },
+      { name: 'Braço', id:'Braco', desc: 'Personalizar braços', statusClass: 'safe', enabled: false },
+      { name: 'Curar-se', id:'Curar', desc: 'Invencibilidade total', statusClass: 'safe', enabled: false },
+      { name: 'Curar-se', id:'Curar2', desc: 'Invencibilidade total', statusClass: 'safe', enabled: false }
+    ],
+    jogadorRoupaPresets: [
+      { name: 'Doisdo', id:'Doisdo', desc: 'Cidade: bahamas', statusClass: 'safe', enabled: false },
+      { name: 'Assogueiro', id:'Assogueiro', desc: 'Cidade: santa group', statusClass: 'safe', enabled: false },
+      { name: 'Paulinho loko', id:'Paulinho', desc: 'Cidade: fluxo', statusClass: 'safe', enabled: false }
+    ],
+    veiculosFeatures: [
+      { name: 'Lista de Veiculos', id:'ListaVeiculos', desc: 'Mostra os veiculos proximos', statusClass: 'safe', enabled: false },
+      { name: 'Reparar Veiculo', id:'Reparar Veiculo', desc: 'Concertar o veiculo selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Trancar Veiculo', id:'Trancar Veiculo', desc: 'Desabilita o veiculo selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Destrancar Veiculo', id:'Destrancar Veiculo', desc: 'Tranca veiculo selecionado', statusClass: 'safe', enabled: false },
+      { name: 'HandLing', id:'HandLing', desc: 'Destranca veiculo selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Tunar no Máximo', id:'Tunar no Máximo', desc: 'Dirige melhor', statusClass: 'safe', enabled: false },
+      { name: 'Teleportar', id:'TPVeiculo', desc: 'Pega essa onda', statusClass: 'safe', enabled: false },
+      { name: 'Trazer', id:'TrazerVeiculo', desc: 'Controla veiculo de longe', statusClass: 'safe', enabled: false },
+      { name: 'Teleportar', id:'TPParaVeiculo', desc: 'Teleporta para veiculo selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Bugar Veículo', id:'BugarVeiculo', desc: 'Buga veiculo selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Remover P1', id:'RemoverP1', desc: 'Retira motorista do carro selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Deletar', id:'DeletarVeiculo', desc: 'Deleta veiculo desocupado selecionado', statusClass: 'safe', enabled: false }
+    ],
+    armasFeatures: [
+      { name: 'Pistola MK2', id:'Pistola MK2', desc: 'Spawn pistola (risco de ban)', statusClass: 'safe', enabled: false },
+      { name: 'Remover armas', id:'Remover armas', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Adicionar Munição', id:'DarMunicao', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Munição Infinita', id:'Munição Infinita', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Manter Munição', id:'ManterMunicao', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Munição de Fogo', id:'MunFogo', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Munição Perfurante', id:'MunPerfurante', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Adicionar Attachs', id:'AddAttachs', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Remover Attachs', id:'RemoverAttachs', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false }
+    ],
+    aimbotFeatures: [
+      { name: 'Aimlock', id:'Aimlock', desc: 'Ativa o aimbot principal', statusClass: 'safe', enabled: false },
+      { name: 'FOV Aimbot', id:'FovAim', desc: 'Mostra o FOV', statusClass: 'safe', enabled: false },
+      { name: 'Mirar em NPCs', id:'AimNPC', desc: 'Aimbot interage com NPCs', statusClass: 'risk', enabled: false },
+      { name: 'Mirar em Mortos', id:'AimMorto', desc: 'Aimbot interage com mortos', statusClass: 'safe', enabled: false },
+      { name: 'Silent Aim', id:'SilentAim', desc: 'Tiro acerta com mira fora do alvo', statusClass: 'safe', enabled: false },
+      { name: 'FOV Silent', id:'FovSilentToggle', desc: 'Mostra o FOV', statusClass: 'safe', enabled: false }
+    ],
+    onlinePlayers: [
+      { name: 'Lista de Players', id:'ListaPlayers', desc: 'Mostrar Players Proximo', statusClass: 'safe', enabled: false },
+      { name: 'Spectar Player', id:'Spectar', desc: 'Visão do player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'TP Player', id:'TPPlayer', desc: 'Teleporta no player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Copiar o Ped', id:'CopiarPed', desc: 'Clona o personagem selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Saquear Player', id:'Saquear', desc: 'Rouba o player morto selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Derrubar Heli', id:'DerrubarHeli', desc: 'Explode veiculos', statusClass: 'safe', enabled: false },
+      { name: 'Salvar Veiculos', id:'SalvarVeiculos', desc: 'Usar antes das funções abaixo', statusClass: 'safe', enabled: false },
+      { name: 'Indexar Veiculos', id:'IndexarVeiculos', desc: 'Anexa veiculo no player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Chuva de Veículos', id:'ChuvaVeiculos', desc: 'Meteoro de veiculo no player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Bugar Player', id:'BugarPlayer', desc: 'Deixa o veiculo todo torto', statusClass: 'safe', enabled: false }
+    ],
+    exploitsFeatures: [
+      { name: 'Coronhada', id:'Coronhada', desc: 'Teleporta e executa corpo-a-corpo', statusClass: 'safe', enabled: false },
+      { name: 'Olhos Laser', id:'OlhosLaser', desc: 'Dispara sem matar laser pelos olhos', statusClass: 'safe', enabled: false },
+      { name: 'Comer Player', id:'ComerPlayer', desc: 'sexo no player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Super Soco Veiculos', id:'SuperSoco', desc: 'Apenas no veiculo', statusClass: 'safe', enabled: false },
+      { name: 'Ser Carregado', id:'SerCarregado', desc: 'Fake [H]', statusClass: 'safe', enabled: false },
+      { name: 'Surfar no veiculo', id:'Surfar', desc: 'Tirando onda', statusClass: 'safe', enabled: false },
+      { name: 'Destruir veiculo', id:'DestruirVeic', desc: 'Kabum', statusClass: 'safe', enabled: false },
+      { name: 'Controle remoto', id:'ControleRemoto', desc: 'Controlar veiculo selecionado', statusClass: 'safe', enabled: false }
+    ],
+    visualFeatures: [
+      { name: 'ESP Nome', id:'ESP Nome', desc: 'Ajustar brilho do ESP', statusClass: 'safe', enabled: false },
+      { name: 'ESP Skeletons', id:'ESP Skeletons', desc: 'Controlar condições climáticas', statusClass: 'safe', enabled: false },
+      { name: 'ESP ESPBox', id:'ESP Box', desc: 'Controlar direção e intensidade', statusClass: 'safe', enabled: false },
+      { name: 'ESP Morto', id:'ESPMorto', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
+      { name: 'ESP Arma', id:'ESPArma', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
+      { name: 'ESP Distancia', id:'EspDistance', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
+      { name: 'ESP ADM', id:'ESP ADM', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
+      { name: 'ESP Veiculo', id:'ESPVeiculo', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
+      { name: 'ESP Veiculo Trancado', id:'ESPVeiculoTrancado', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false }
+    ],
+    configuracoesFeatures: [
+      { name: 'Exibir Mapa', id:'ExibirMapa', desc: 'Mostra mapa na tela', statusClass: 'safe', enabled: false },
+      { name: 'FPS Mode', id:'FPS Mode', desc: 'Otimização Grafica', statusClass: 'safe', enabled: false }
+    ],
+    fovAimlockValue: 1.0,
+    fovSilentValue: 1.5
+  },
+  methods: {
+    selectButton: function(name) {
+      this.activeButton = name;
+      var map = { Jogador:'Geral', Veiculos:'Todos', Armas:'Todas', Aimbot:'Geral', Online:'Todos', Exploits:'Trolls', Visual:'ESP', Configuracoes:'Geral' };
+      this.activeSubTab = map[name] || 'Geral';
+    },
+    selectSubTab: function(name) { this.activeSubTab = name; },
+    toggleFeature: function(f) { f.enabled = !f.enabled; },
+    onToggle: function(group, idx, e) {
+      var lists = {
+        jogadorGeral: 'jogadorGeralFeatures',
+        jogadorMov: 'jogadorMovimentacaoFeatures',
+        jogadorPod: 'jogadorPoderesFeatures',
+        jogadorOut: 'jogadorOutrosFeatures',
+        jogadorRoupa: 'jogadorRoupaFeatures',
+        jogadorRoupaPreset: 'jogadorRoupaPresets',
+        veiculos: 'veiculosFeatures',
+        armas: 'armasFeatures',
+        aimbot: 'aimbotFeatures',
+        online: 'onlinePlayers',
+        exploits: 'exploitsFeatures',
+        visual: 'visualFeatures',
+        config: 'configuracoesFeatures'
+      };
+      var listName = lists[group];
+      if (!listName) return;
+      var feature = this[listName][idx];
+      if (!feature) return;
+      feature.enabled = e.target.checked;
+      sendAction('toggleChange', { id: feature.id, value: feature.enabled });
+    },
+    sendSlider: function(id, value) {
+      sendAction('sliderChange', { id: id, value: value });
+    }
   }
-  if (!tab || !tab.items) return;
-  tab.items.forEach(function(item) {
-    var div = document.createElement('div');
-    div.className = 'menu-item';
-    if (item.type === 'button') {
-      div.classList.add('btn-item');
-      var span = document.createElement('span');
-      span.className = 'label';
-      span.textContent = item.label;
-      div.appendChild(span);
-      div.onclick = function() { sendAction('buttonClick', { id: item.id, tab: activeTab }); };
-    } else if (item.type === 'checkbox' || item.type === 'toggle') {
-      var span = document.createElement('span');
-      span.className = 'label';
-      span.textContent = item.label;
-      div.appendChild(span);
-      var track = document.createElement('div');
-      track.className = 'toggle-track' + (item.value ? ' on' : '');
-      var knob = document.createElement('div');
-      knob.className = 'toggle-knob';
-      track.appendChild(knob);
-      div.appendChild(track);
-      div.onclick = function() {
-        var newVal = !item.value;
-        item.value = newVal;
-        track.className = 'toggle-track' + (newVal ? ' on' : '');
-        sendAction('toggleChange', { id: item.id, tab: activeTab, value: newVal });
-      };
-    } else if (item.type === 'slider') {
-      div.classList.add('slider-container');
-      var span = document.createElement('span');
-      span.className = 'label';
-      span.textContent = item.label;
-      div.appendChild(span);
-      var row = document.createElement('div');
-      row.className = 'slider-row';
-      var input = document.createElement('input');
-      input.type = 'range';
-      input.min = item.min || 0;
-      input.max = item.max || 100;
-      input.value = item.value || 50;
-      var val = document.createElement('span');
-      val.className = 'slider-value';
-      val.textContent = Math.round(input.value);
-      row.appendChild(input);
-      row.appendChild(val);
-      div.appendChild(row);
-      var timer = null;
-      input.oninput = function() {
-        val.textContent = input.value;
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(function() {
-          sendAction('sliderChange', { id: item.id, tab: activeTab, value: parseFloat(input.value) });
-        }, 150);
-      };
-    }
-    contentContainer.appendChild(div);
-  });
-}
-
-function renderPlayerList(players) {
-  if (!players || players.length === 0) { playerListEl.style.display = 'none'; return; }
-  playerListEl.style.display = 'block';
-  playerListEl.innerHTML = '';
-  players.forEach(function(p) {
-    var div = document.createElement('div');
-    div.className = 'player-item' + (p.selected ? ' selected' : '');
-    var name = document.createElement('span');
-    name.className = 'name';
-    name.textContent = p.name;
-    div.appendChild(name);
-    if (p.distance !== undefined) {
-      var d = document.createElement('span');
-      d.className = 'dist';
-      d.textContent = p.distance + 'm';
-      div.appendChild(d);
-    }
-    if (p.status) {
-      var s = document.createElement('span');
-      s.className = 'status ' + (p.status === 'dead' ? 'dead' : 'alive');
-      s.textContent = p.status === 'dead' ? '[M]' : '[V]';
-      div.appendChild(s);
-    }
-    div.onclick = function() {
-      sendAction('playerSelect', { id: p.id });
-      document.querySelectorAll('.player-item').forEach(function(el) { el.classList.remove('selected'); });
-      div.classList.add('selected');
-    };
-    playerListEl.appendChild(div);
-  });
-}
-
-function loadDemoData() {
-  menuData = {
-    tabs: [
-      { id: "Jogador", text: "Jogador", items: [
-        { type: "toggle", id: "Godmod", label: "GodMod", value: false },
-        { type: "button", id: "Reviver", label: "Reviver" },
-        { type: "button", id: "Suicidio", label: "Suicidio" },
-        { type: "toggle", id: "Noclip", label: "Noclip", value: false },
-        { type: "toggle", id: "Invisivel", label: "Invisível", value: false },
-        { type: "toggle", id: "Modo Flash", label: "Modo Flash", value: false },
-        { type: "toggle", id: "WallGhost", label: "WallGhost", value: false },
-        { type: "button", id: "TPWaypoint", label: "TPWaypoint" },
-        { type: "toggle", id: "NoRagdoll", label: "NoRagdoll", value: false },
-        { type: "toggle", id: "CameraLivre", label: "CameraLivre", value: false }
-      ]},
-      { id: "Veiculos", text: "Veículos", items: [
-        { type: "button", id: "Reparar Veiculo", label: "Reparar Veículo" },
-        { type: "button", id: "Trancar Veiculo", label: "Trancar Veículo" },
-        { type: "button", id: "Destrancar Veiculo", label: "Destrancar Veículo" },
-        { type: "button", id: "Tunar no Máximo", label: "Tunar no Máximo" }
-      ]},
-      { id: "Armas", text: "Armas", items: [
-        { type: "button", id: "Pistola MK2", label: "Pistola MK2" },
-        { type: "button", id: "Remover armas", label: "Remover Armas" },
-        { type: "toggle", id: "Munição Infinita", label: "Munição Infinita", value: false }
-      ]},
-      { id: "Visual", text: "Visual", items: [
-        { type: "toggle", id: "ESP Nome", label: "ESP Nome", value: false },
-        { type: "toggle", id: "ESP Skeletons", label: "ESP Skeletons", value: false },
-        { type: "toggle", id: "ESP Box", label: "ESP Box", value: false },
-        { type: "toggle", id: "ESP ADM", label: "ESP ADM (Invisível)", value: false }
-      ]}
-    ]
-  };
-  activeTab = "Jogador";
-  renderTabs();
-  renderContent();
-}
+});
 
 try {
-  if (window.self !== window.top) {
-    isInGame = true;
-  } else {
-    isInGame = false;
-    loadDemoData();
-  }
-} catch(e) {
-  isInGame = false;
-  loadDemoData();
-}
+  isInGame = window.self !== window.top;
+} catch(e) { isInGame = false; }
 
 window.addEventListener('message', function(event) {
   var data = event.data;
-  if (typeof data === 'string') {
-    try { data = JSON.parse(data); } catch(e) { return; }
-  }
+  if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return; } }
   if (!data || !data.action) return;
   isInGame = true;
   switch (data.action) {
     case 'showMenu':
-      menuData = data.menu;
-      activeTab = data.menu && data.menu.tabs && data.menu.tabs[0] ? data.menu.tabs[0].id : null;
-      renderTabs();
-      renderContent();
-      break;
-    case 'notify':
-      notify(data.message, data.type);
-      break;
-    case 'updateStates':
-      if (data.states && menuData && menuData.tabs) {
-        menuData.tabs.forEach(function(tab) {
-          if (tab.items) {
-            tab.items.forEach(function(item) {
-              if ((item.type === 'checkbox' || item.type === 'toggle') && data.states[item.id] !== undefined) {
-                item.value = data.states[item.id];
-              }
-              if (item.type === 'slider' && data.states[item.id] !== undefined) {
-                item.value = data.states[item.id];
+      document.getElementById('appWrap').style.display = '';
+      if (data.profile) {
+        app.userProfile = data.profile;
+      }
+      if (data.fov) {
+        if (data.fov.FovAimlock !== undefined) app.fovAimlockValue = data.fov.FovAimlock;
+        if (data.fov.FovSilent !== undefined) app.fovSilentValue = data.fov.FovSilent;
+      }
+      if (data.states && typeof data.states === 'object') {
+        var stateMap = data.states;
+        var allLists = [
+          'jogadorGeralFeatures','jogadorMovimentacaoFeatures','jogadorPoderesFeatures','jogadorOutrosFeatures',
+          'jogadorRoupaFeatures','jogadorRoupaPresets','veiculosFeatures','armasFeatures',
+          'aimbotFeatures','onlinePlayers','exploitsFeatures','visualFeatures','configuracoesFeatures'
+        ];
+        allLists.forEach(function(listName) {
+          var list = app[listName];
+          if (list) {
+            list.forEach(function(f) {
+              var val = stateMap[f.id];
+              if (val !== undefined) {
+                f.enabled = val;
               }
             });
           }
         });
-        if (activeTab) renderContent();
       }
       break;
-    case 'updatePlayerList':
-      renderPlayerList(data.players);
+    case 'hideMenu':
+      document.getElementById('appWrap').style.display = 'none';
+      break;
+    case 'updateProfile':
+      if (data.profile) app.userProfile = data.profile;
+      break;
+    case 'updateStates':
+      if (data.states) {
+        var allLists = [
+          'jogadorGeralFeatures','jogadorMovimentacaoFeatures','jogadorPoderesFeatures','jogadorOutrosFeatures',
+          'jogadorRoupaFeatures','jogadorRoupaPresets','veiculosFeatures','armasFeatures',
+          'aimbotFeatures','onlinePlayers','exploitsFeatures','visualFeatures','configuracoesFeatures'
+        ];
+        allLists.forEach(function(listName) {
+          var list = app[listName];
+          if (list) {
+            list.forEach(function(f) {
+              var val = data.states[f.id];
+              if (val !== undefined) {
+                f.enabled = val;
+              }
+            });
+          }
+        });
+        if (data.states.FovAimlock !== undefined) app.fovAimlockValue = data.states.FovAimlock;
+        if (data.states.FovSilent !== undefined) app.fovSilentValue = data.states.FovSilent;
+      }
+      break;
+    case 'notify':
       break;
   }
 });
