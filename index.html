@@ -10,11 +10,11 @@
     body::-webkit-scrollbar,.content::-webkit-scrollbar{display:none}
     body{-ms-overflow-style:none;scrollbar-width:none;background:transparent;overflow:hidden;height:100vh;width:100vw}
     #appWrap{position:absolute;left:20px;top:20px;width:900px;height:680px}
-    #dragBar{width:100%;height:10px;cursor:move;background:transparent;position:absolute;top:-10px;left:0;z-index:10}
     #app{width:100%;height:100%;border:1px solid #444;display:flex;overflow:hidden;background:rgba(25,25,35,0.95);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);position:relative}
     .sidebar{width:200px;background:rgb(0 0 0 / 95%);display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:15px 0;border-right:1px solid #333}
-    .logo{width:180px;height:90px;display:flex;justify-content:center;align-items:center;border-radius:10px;margin-bottom:20px;box-shadow:0 4px 10px rgba(0,0,0,0.3);overflow:hidden;background:#000}
-    .logo img{width:50%;height:100%}
+    .logo{width:180px;height:90px;display:flex;justify-content:center;align-items:center;border-radius:10px;margin-bottom:20px;box-shadow:0 4px 10px rgba(0,0,0,0.3);overflow:hidden;background:#000;cursor:grab;cursor:-webkit-grab}
+    .logo:active{cursor:grabbing;cursor:-webkit-grabbing}
+    .logo img{width:50%;height:100%;pointer-events:none}
     .menu-buttons{display:flex;flex-direction:column;align-items:center;width:100%}
     .sidebar button{width:90%;padding:10px 10px;margin:10px 0;background:rgba(40,40,55,0.8);color:#ff0000;border:none;outline:none;cursor:pointer;border-radius:8px;transition:all 0.3s ease;font-size:14px;display:flex;align-items:center;justify-content:flex-start;gap:12px;box-shadow:0 3px 6px rgba(0,0,0,0.2)}
     .sidebar button i{margin-left:10px;width:20px;text-align:center;color:#fff}
@@ -73,8 +73,6 @@
 </head>
 <body>
 <div id="appWrap">
-  <div id="dragBar"></div>
-  <div id="app">
     <div class="sidebar">
       <div class="logo">
         <img src="https://jonquishot.github.io/Background/logo.png" alt="MiauScript Logo">
@@ -350,20 +348,22 @@
 var isInGame = false;
 var isVisible = true;
 
-// Drag
+// Drag pela logo
 (function(){
   var wrap = document.getElementById('appWrap');
-  var bar = document.getElementById('dragBar');
-  var offX, offY, dragging = false;
-  bar.addEventListener('mousedown', function(e){
+  var logo = document.querySelector('.logo');
+  var dragging = false, dx = 0, dy = 0;
+  logo.addEventListener('mousedown', function(e){
     dragging = true;
-    offX = e.clientX - wrap.offsetLeft;
-    offY = e.clientY - wrap.offsetTop;
+    var r = wrap.getBoundingClientRect();
+    dx = e.clientX - r.left;
+    dy = e.clientY - r.top;
+    e.stopPropagation();
   });
   document.addEventListener('mousemove', function(e){
     if (!dragging) return;
-    wrap.style.left = (e.clientX - offX) + 'px';
-    wrap.style.top = (e.clientY - offY) + 'px';
+    wrap.style.left = (e.clientX - dx) + 'px';
+    wrap.style.top = (e.clientY - dy) + 'px';
   });
   document.addEventListener('mouseup', function(){ dragging = false; });
 })();
@@ -409,23 +409,23 @@ var app = new Vue({
       { name: 'Invisivel', id:'Invisivel', desc: 'Só ADM consegue te ver', statusClass: 'safe', enabled: false }
     ],
     jogadorMovimentacaoFeatures: [
-      { name: 'Salvar TPMorto', id:'SalvarTPMorto', desc: 'Usar antes do TPWay Morto', statusClass: 'safe', enabled: false },
+      { name: 'Salvar TPMorto', id:'Salvar TPMorto', desc: 'Usar antes do TPWay Morto', statusClass: 'safe', enabled: false },
       { name: 'TPway Morto', id:'TPMorto', desc: 'Teleporta ao morrer', statusClass: 'safe', enabled: false },
       { name: 'Teleporte Waypoint', id:'TPWaypoint', desc: 'Teleporta para o local marcado', statusClass: 'safe', enabled: false },
-      { name: 'Correr Rapido', id:'SuperPulo', desc: 'Boost aceitavel', statusClass: 'safe', enabled: false },
-      { name: '[F] Rápido', id:'EntradaRapida', desc: 'Entra/sai rapido do veículo', statusClass: 'safe', enabled: false }
+      { name: 'Correr Rapido', id:'Correr Rapido', desc: 'Boost aceitavel', statusClass: 'safe', enabled: false },
+      { name: '[F] Rápido', id:'[F] Rápido', desc: 'Entra/sai rapido do veículo', statusClass: 'safe', enabled: false }
     ],
     jogadorPoderesFeatures: [
       { name: 'Hulk', id:'Hulk', desc: 'Arremessa veículos no Y', statusClass: 'safe', enabled: false },
       { name: 'Magneto', id:'Magneto', desc: 'Atrair e repelir veículos', statusClass: 'safe', enabled: false },
       { name: 'Flash', id:'Modo Flash', desc: 'Homem mais rapido do mundo', statusClass: 'safe', enabled: false },
-      { name: 'Andar sobre a água', id:'AndarAgua', desc: 'Igual Jesus', statusClass: 'risk', enabled: false },
+      { name: 'Andar sobre a água', id:'Andar Na água', desc: 'Igual Jesus', statusClass: 'risk', enabled: false },
       { name: 'Lince Negra', id:'WallGhost', desc: 'Atravessar parede', statusClass: 'risk', enabled: false }
     ],
     jogadorOutrosFeatures: [
-      { name: 'Reset PED', id:'ResetPed', desc: 'Reseta o seu personagem', statusClass: 'safe', enabled: false },
-      { name: 'Sessão Solo', id:'SessaoSolo', desc: 'Outra dimensão', statusClass: 'safe', enabled: false },
-      { name: 'Anti-ADM', id:'AntiADM', desc: 'Se esconde distande de todos', statusClass: 'safe', enabled: false },
+      { name: 'Reset PED', id:'Reset Ped', desc: 'Reseta o seu personagem', statusClass: 'safe', enabled: false },
+      { name: 'Sessão Solo', id:'Sessão Solo', desc: 'Outra dimensão', statusClass: 'safe', enabled: false },
+      { name: 'Anti-ADM', id:'Anti-ADM Session', desc: 'Se esconde distande de todos', statusClass: 'safe', enabled: false },
       { name: 'No Ragdoll', id:'NoRagdoll', desc: 'Não cai da moto', statusClass: 'safe', enabled: false },
       { name: 'FreeCam', id:'CameraLivre', desc: 'Não cai da moto', statusClass: 'safe', enabled: false }
     ],
@@ -441,73 +441,73 @@ var app = new Vue({
       { name: 'Paulinho loko', id:'Paulinho', desc: 'Cidade: fluxo', statusClass: 'safe', enabled: false }
     ],
     veiculosFeatures: [
-      { name: 'Lista de Veiculos', id:'ListaVeiculos', desc: 'Mostra os veiculos proximos', statusClass: 'safe', enabled: false },
+      { name: 'Lista de Veiculos', id:'Lista de Veículos', desc: 'Mostra os veiculos proximos', statusClass: 'safe', enabled: false },
       { name: 'Reparar Veiculo', id:'Reparar Veiculo', desc: 'Concertar o veiculo selecionado', statusClass: 'safe', enabled: false },
       { name: 'Trancar Veiculo', id:'Trancar Veiculo', desc: 'Desabilita o veiculo selecionado', statusClass: 'safe', enabled: false },
       { name: 'Destrancar Veiculo', id:'Destrancar Veiculo', desc: 'Tranca veiculo selecionado', statusClass: 'safe', enabled: false },
       { name: 'HandLing', id:'HandLing', desc: 'Destranca veiculo selecionado', statusClass: 'safe', enabled: false },
       { name: 'Tunar no Máximo', id:'Tunar no Máximo', desc: 'Dirige melhor', statusClass: 'safe', enabled: false },
-      { name: 'Teleportar', id:'TPVeiculo', desc: 'Pega essa onda', statusClass: 'safe', enabled: false },
-      { name: 'Trazer', id:'TrazerVeiculo', desc: 'Controla veiculo de longe', statusClass: 'safe', enabled: false },
-      { name: 'Teleportar', id:'TPParaVeiculo', desc: 'Teleporta para veiculo selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Bugar Veículo', id:'BugarVeiculo', desc: 'Buga veiculo selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Remover P1', id:'RemoverP1', desc: 'Retira motorista do carro selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Deletar', id:'DeletarVeiculo', desc: 'Deleta veiculo desocupado selecionado', statusClass: 'safe', enabled: false }
+      { name: 'Teleportar', id:'Teleportar', desc: 'Pega essa onda', statusClass: 'safe', enabled: false },
+      { name: 'Trazer', id:'Trazer', desc: 'Controla veiculo de longe', statusClass: 'safe', enabled: false },
+      { name: 'Teleportar', id:'Teleportar', desc: 'Teleporta para veiculo selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Bugar Veículo', id:'Bugar Veículo', desc: 'Buga veiculo selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Remover P1', id:'Remover P1', desc: 'Retira motorista do carro selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Deletar', id:'Deletar', desc: 'Deleta veiculo desocupado selecionado', statusClass: 'safe', enabled: false }
     ],
     armasFeatures: [
       { name: 'Pistola MK2', id:'Pistola MK2', desc: 'Spawn pistola (risco de ban)', statusClass: 'safe', enabled: false },
       { name: 'Remover armas', id:'Remover armas', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
-      { name: 'Adicionar Munição', id:'DarMunicao', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Adicionar Munição', id:'Adicionar Munição', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
       { name: 'Munição Infinita', id:'Munição Infinita', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
-      { name: 'Manter Munição', id:'ManterMunicao', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
-      { name: 'Munição de Fogo', id:'MunFogo', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
-      { name: 'Munição Perfurante', id:'MunPerfurante', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
-      { name: 'Adicionar Attachs', id:'AddAttachs', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
-      { name: 'Remover Attachs', id:'RemoverAttachs', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false }
+      { name: 'Manter Munição', id:'Manter Munição', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Munição de Fogo', id:'Munição de Fogo', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Munição Perfurante', id:'Munição Perfurante', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Adicionar Attachs', id:'Adicionar Attachs', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false },
+      { name: 'Remover Attachs', id:'Remover Attachs', desc: 'Adicionar à mão', statusClass: 'safe', enabled: false }
     ],
     aimbotFeatures: [
       { name: 'Aimlock', id:'Aimlock', desc: 'Ativa o aimbot principal', statusClass: 'safe', enabled: false },
-      { name: 'FOV Aimbot', id:'FovAim', desc: 'Mostra o FOV', statusClass: 'safe', enabled: false },
-      { name: 'Mirar em NPCs', id:'AimNPC', desc: 'Aimbot interage com NPCs', statusClass: 'risk', enabled: false },
-      { name: 'Mirar em Mortos', id:'AimMorto', desc: 'Aimbot interage com mortos', statusClass: 'safe', enabled: false },
-      { name: 'Silent Aim', id:'SilentAim', desc: 'Tiro acerta com mira fora do alvo', statusClass: 'safe', enabled: false },
-      { name: 'FOV Silent', id:'FovSilentToggle', desc: 'Mostra o FOV', statusClass: 'safe', enabled: false }
+      { name: 'FOV Aimbot', id:'Mostrar FOV', desc: 'Mostra o FOV', statusClass: 'safe', enabled: false },
+      { name: 'Mirar em NPCs', id:'Mirar em NPCs', desc: 'Aimbot interage com NPCs', statusClass: 'risk', enabled: false },
+      { name: 'Mirar em Mortos', id:'Mirar em Mortos', desc: 'Aimbot interage com mortos', statusClass: 'safe', enabled: false },
+      { name: 'Silent Aim', id:'Silent Aim', desc: 'Tiro acerta com mira fora do alvo', statusClass: 'safe', enabled: false },
+      { name: 'FOV Silent', id:'Mostrar FOV Silent', desc: 'Mostra o FOV', statusClass: 'safe', enabled: false }
     ],
     onlinePlayers: [
-      { name: 'Lista de Players', id:'ListaPlayers', desc: 'Mostrar Players Proximo', statusClass: 'safe', enabled: false },
-      { name: 'Spectar Player', id:'Spectar', desc: 'Visão do player selecionado', statusClass: 'safe', enabled: false },
-      { name: 'TP Player', id:'TPPlayer', desc: 'Teleporta no player selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Copiar o Ped', id:'CopiarPed', desc: 'Clona o personagem selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Saquear Player', id:'Saquear', desc: 'Rouba o player morto selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Derrubar Heli', id:'DerrubarHeli', desc: 'Explode veiculos', statusClass: 'safe', enabled: false },
-      { name: 'Salvar Veiculos', id:'SalvarVeiculos', desc: 'Usar antes das funções abaixo', statusClass: 'safe', enabled: false },
-      { name: 'Indexar Veiculos', id:'IndexarVeiculos', desc: 'Anexa veiculo no player selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Chuva de Veículos', id:'ChuvaVeiculos', desc: 'Meteoro de veiculo no player selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Bugar Player', id:'BugarPlayer', desc: 'Deixa o veiculo todo torto', statusClass: 'safe', enabled: false }
+      { name: 'Lista de Players', id:'Lista de Players', desc: 'Mostrar Players Proximo', statusClass: 'safe', enabled: false },
+      { name: 'Spectar Player', id:'Spectar Player', desc: 'Visão do player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'TP Player', id:'TP Player', desc: 'Teleporta no player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Copiar o Ped', id:'Copiar Roupa', desc: 'Clona o personagem selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Saquear Player', id:'Saquear Player', desc: 'Rouba o player morto selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Derrubar Heli', id:'Derrubar Heli', desc: 'Explode veiculos', statusClass: 'safe', enabled: false },
+      { name: 'Salvar Veiculos', id:'Salvar Veiculos', desc: 'Usar antes das funções abaixo', statusClass: 'safe', enabled: false },
+      { name: 'Indexar Veiculos', id:'Indexar Veiculos', desc: 'Anexa veiculo no player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Chuva de Veículos', id:'Chuva de Veículos', desc: 'Meteoro de veiculo no player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Bugar Player', id:'Bugar Player', desc: 'Deixa o veiculo todo torto', statusClass: 'safe', enabled: false }
     ],
     exploitsFeatures: [
       { name: 'Coronhada', id:'Coronhada', desc: 'Teleporta e executa corpo-a-corpo', statusClass: 'safe', enabled: false },
-      { name: 'Olhos Laser', id:'OlhosLaser', desc: 'Dispara sem matar laser pelos olhos', statusClass: 'safe', enabled: false },
-      { name: 'Comer Player', id:'ComerPlayer', desc: 'sexo no player selecionado', statusClass: 'safe', enabled: false },
-      { name: 'Super Soco Veiculos', id:'SuperSoco', desc: 'Apenas no veiculo', statusClass: 'safe', enabled: false },
-      { name: 'Ser Carregado', id:'SerCarregado', desc: 'Fake [H]', statusClass: 'safe', enabled: false },
-      { name: 'Surfar no veiculo', id:'Surfar', desc: 'Tirando onda', statusClass: 'safe', enabled: false },
-      { name: 'Destruir veiculo', id:'DestruirVeic', desc: 'Kabum', statusClass: 'safe', enabled: false },
-      { name: 'Controle remoto', id:'ControleRemoto', desc: 'Controlar veiculo selecionado', statusClass: 'safe', enabled: false }
+      { name: 'Olhos Laser', id:'Olhos Laser', desc: 'Dispara sem matar laser pelos olhos', statusClass: 'safe', enabled: false },
+      { name: 'Comer Player', id:'Comer Player', desc: 'sexo no player selecionado', statusClass: 'safe', enabled: false },
+      { name: 'Super Soco Veiculos', id:'Super Soco Veiculos', desc: 'Apenas no veiculo', statusClass: 'safe', enabled: false },
+      { name: 'Ser Carregado', id:'Ser Carregado', desc: 'Fake [H]', statusClass: 'safe', enabled: false },
+      { name: 'Surfar no veiculo', id:'Surfar no Veículo', desc: 'Tirando onda', statusClass: 'safe', enabled: false },
+      { name: 'Destruir veiculo', id:'Destruir Veiculo', desc: 'Kabum', statusClass: 'safe', enabled: false },
+      { name: 'Controle remoto', id:'Controle Remoto', desc: 'Controlar veiculo selecionado', statusClass: 'safe', enabled: false }
     ],
     visualFeatures: [
       { name: 'ESP Nome', id:'ESP Nome', desc: 'Ajustar brilho do ESP', statusClass: 'safe', enabled: false },
       { name: 'ESP Skeletons', id:'ESP Skeletons', desc: 'Controlar condições climáticas', statusClass: 'safe', enabled: false },
-      { name: 'ESP ESPBox', id:'ESP Box', desc: 'Controlar direção e intensidade', statusClass: 'safe', enabled: false },
-      { name: 'ESP Morto', id:'ESPMorto', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
-      { name: 'ESP Arma', id:'ESPArma', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
+      { name: 'ESP ESPBox', id:'ESP ESPBox', desc: 'Controlar direção e intensidade', statusClass: 'safe', enabled: false },
+      { name: 'ESP Morto', id:'ESP Morto', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
+      { name: 'ESP Arma', id:'ESP Arma', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
       { name: 'ESP Distancia', id:'EspDistance', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
       { name: 'ESP ADM', id:'ESP ADM', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
-      { name: 'ESP Veiculo', id:'ESPVeiculo', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
-      { name: 'ESP Veiculo Trancado', id:'ESPVeiculoTrancado', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false }
+      { name: 'ESP Veiculo', id:'ESP Veiculo', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false },
+      { name: 'ESP Veiculo Trancado', id:'ESP Veiculo Trancado', desc: 'Definir hora do dia', statusClass: 'safe', enabled: false }
     ],
     configuracoesFeatures: [
-      { name: 'Exibir Mapa', id:'ExibirMapa', desc: 'Mostra mapa na tela', statusClass: 'safe', enabled: false },
+      { name: 'Exibir Mapa', id:'Exibir Mapa', desc: 'Mostra mapa na tela', statusClass: 'safe', enabled: false },
       { name: 'FPS Mode', id:'FPS Mode', desc: 'Otimização Grafica', statusClass: 'safe', enabled: false }
     ],
     fovAimlockValue: 1.0,
