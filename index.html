@@ -7,13 +7,13 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Inter,sans-serif}
-body{background:#0f0f0f;display:flex;align-items:center;justify-content:center}
+body{background:transparent}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:rgba(139,92,246,.4);border-radius:2px}
 ::-webkit-scrollbar-track{background:transparent}
 
-.menu-root{width:36vh;max-height:42vh;display:flex;flex-direction:column;background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0f0f0f 100%);border-radius:1.2vh;border:1px solid rgba(139,92,246,.15);overflow:hidden;box-shadow:0 0 3vh rgba(139,92,246,.15)}
-.menu-header{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(168,85,247,.08));padding:1.2vh 1.6vh;text-align:center;border-bottom:1px solid rgba(139,92,246,.12)}
+.menu-root{position:absolute;left:2vh;top:2vh;width:36vh;max-height:42vh;display:flex;flex-direction:column;background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0f0f0f 100%);border-radius:1.2vh;border:1px solid rgba(139,92,246,.15);overflow:hidden;box-shadow:0 0 3vh rgba(139,92,246,.15)}
+.menu-header{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(168,85,247,.08));padding:1.2vh 1.6vh;text-align:center;border-bottom:1px solid rgba(139,92,246,.12);cursor:move;user-select:none}
 .menu-header h1{color:#8b5cf6;font-size:1.6vh;font-weight:600;letter-spacing:.5px;text-shadow:0 0 1vh rgba(139,92,246,.2)}
 .menu-body{display:flex;flex:1;min-height:0}
 .menu-tabs{width:9vh;flex-shrink:0;background:rgba(0,0,0,.3);padding:.6vh 0;border-right:1px solid rgba(139,92,246,.1)}
@@ -79,6 +79,20 @@ var playerListEl = document.getElementById('playerList');
 var menuData = null;
 var activeTab = null;
 var isInGame = false;
+
+var dragTarget = null, dragOffX = 0, dragOffY = 0;
+var header = menuRoot.querySelector('.menu-header');
+header.addEventListener('mousedown', function(e) {
+  dragTarget = menuRoot;
+  dragOffX = e.clientX - menuRoot.offsetLeft;
+  dragOffY = e.clientY - menuRoot.offsetTop;
+});
+document.addEventListener('mousemove', function(e) {
+  if (!dragTarget) return;
+  dragTarget.style.left = (e.clientX - dragOffX) + 'px';
+  dragTarget.style.top = (e.clientY - dragOffY) + 'px';
+});
+document.addEventListener('mouseup', function() { dragTarget = null; });
 
 function notify(msg, type) {
   var el = document.createElement('div');
@@ -253,10 +267,9 @@ function loadDemoData() {
   renderContent();
 }
 
-// Detect if running inside DUI (FiveM) or browser
 try {
   if (window.self !== window.top) {
-    // Inside DUI/iframe - wait for messages from Lua
+    isInGame = true;
   } else {
     isInGame = false;
     loadDemoData();
